@@ -6,7 +6,22 @@ import { db } from './data/db'
 function App() { //Un componente es un a función de JS y siempre debe iniciar con mayuscula el nombre, se usan para la creación de aplicaciones y sitios web se recomienda usar .jsx o .tsx, los componentes deben ser reutilizables o separados por funcionalidad
 
   const [data, setData] = useState(db)
-  //El valor inicial del state preferiblemente deberia ser vacio, o false, si luego de iterar encuentra algo que cambie a true
+  const [cart, setCart] = useState([]) //El valor inicial del state preferiblemente deberia ser vacio, o false, si luego de iterar encuentra algo que cambie a true
+
+  function addToCard(item) {
+    //un state es inmutable, por lo que tenemos que usar el useState para poder manipularlo
+    //ver este enlace https://doesitmutate.xyz/ para saber que funcion lo muta y cual no
+
+    const itemExists = cart.findIndex((guitar) => guitar.id === item.id);
+    if (itemExists >= 0) {
+      const updatedCart = [...cart]
+      updatedCart[itemExists].quantity++
+      setCart(updatedCart)
+    } else {
+      item.quantity = 1
+      setCart([...cart, item])
+    }
+  }
 
   //Los Statements - pueden ir antes del return
   /* Cada app de Js es una serie de statements, cada staatement es una instrucción para hacer algo 
@@ -25,14 +40,21 @@ function App() { //Un componente es un a función de JS y siempre debe iniciar c
      -.map que genera un nuevo array a diferencia de forEach */
 
     <>
-      <Headers />
+      <Headers
+        cart={cart}
+      />
 
       <main className="container-xl mt-5">
         <h2 className="text-center">Nuestra Colección</h2>
 
         <div className="row mt-5">
-          {data.map(() => (
-            <Guitar />
+          {data.map((guitar) => (
+            <Guitar
+              key={guitar.id}
+              guitar={guitar}
+              setCart={setCart}
+              addToCard={addToCard}
+            />
           ))}
 
         </div>
