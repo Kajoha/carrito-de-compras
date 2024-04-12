@@ -1,3 +1,5 @@
+import { useMemo } from 'react' //useMemo dice "no hagas render de mi aplicación hasta que cambie algo"
+
 /* Maneras de usar fragment en React, simplemente <> </> o importando fragment desde react 
 import {Fragment} from 'react', y se llama como una etiqueta <Fragment></Fragment> otra manera es import React from 'react' y llamar a <React.Fragmen></React.Fragmen>*/
 
@@ -8,10 +10,10 @@ en el return se coloca lo que quiero mostrar en pantalla - Vista o HTML  */
 /*JSX parece JS pero muestra codigo HTML y basicamente es un lenguaje de template/vistas que muestra el html pero tiene todas las funcionalidades de JavaScript
 Una vez compilados son archivos JS con funciones y objetos*/
 
-export default function Headers({ cart }) {
+export default function Headers({ cart, removeFromCart, increaseQuantity, decreaseQuantity }) {
     //state derivado, en este caso retorba un booleano
-    const isEmpty = () => cart.length === 0;
-    const cartTotal = () => cart.reduce((total, item) => total + (item.quantity * item.price), 0);
+    const isEmpty = useMemo(() => cart.length === 0, [cart])
+    const cartTotal = useMemo(() => cart.reduce((total, item) => total + (item.quantity * item.price), 0), [cart]);
 
     return (
         < header className="py-5 header" >
@@ -29,7 +31,7 @@ export default function Headers({ cart }) {
                             <img className="img-fluid" src="./public/img/carrito.png" alt="imagen carrito" />
 
                             <div id="carrito" className="bg-white p-3">
-                                {isEmpty() ? ( //ternario
+                                {isEmpty ? ( //ternario
                                     <p className="text-center">El carrito esta vacio</p>
                                 ) : (
                                     <>
@@ -59,6 +61,7 @@ export default function Headers({ cart }) {
                                                             <button
                                                                 type="button"
                                                                 className="btn btn-dark"
+                                                                onClick={() => decreaseQuantity(guitar.id)}
                                                             >
                                                                 -
                                                             </button>
@@ -66,6 +69,7 @@ export default function Headers({ cart }) {
                                                             <button
                                                                 type="button"
                                                                 className="btn btn-dark"
+                                                                onClick={() => increaseQuantity(guitar.id)}
                                                             >
                                                                 +
                                                             </button>
@@ -74,6 +78,7 @@ export default function Headers({ cart }) {
                                                             <button
                                                                 className="btn btn-danger"
                                                                 type="button"
+                                                                onClick={() => removeFromCart(guitar.id)}
                                                             >
                                                                 X
                                                             </button>
@@ -83,7 +88,7 @@ export default function Headers({ cart }) {
                                             </tbody>
                                         </table>
 
-                                        <p className="text-end">Total pagar: <span className="fw-bold">${cartTotal()} </span></p>
+                                        <p className="text-end">Total pagar: <span className="fw-bold">${cartTotal} </span></p>
                                         <button className="btn btn-dark w-100 mt-3 p-2">Vaciar Carrito</button>
                                     </>
                                 )}

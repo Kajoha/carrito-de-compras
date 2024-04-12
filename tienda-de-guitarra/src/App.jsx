@@ -7,6 +7,8 @@ function App() { //Un componente es un a función de JS y siempre debe iniciar c
 
   const [data, setData] = useState(db)
   const [cart, setCart] = useState([]) //El valor inicial del state preferiblemente deberia ser vacio, o false, si luego de iterar encuentra algo que cambie a true
+  const MAX_ITEMS = 5
+  const MIN_ITEMS = 1
 
   function addToCard(item) {
     //un state es inmutable, por lo que tenemos que usar el useState para poder manipularlo
@@ -30,6 +32,35 @@ function App() { //Un componente es un a función de JS y siempre debe iniciar c
    - Lanzar errres con throw new Error()
    - Iterar con while o for*/
 
+  function removeFromCart(id) {
+    setCart(prevCart => prevCart.filter(guitar => guitar.id !== id))
+  }
+
+  function increaseQuantity(id) {
+    const updateCart = cart.map(item => {
+      if (item.id === id && item.quantity < MAX_ITEMS) {
+        return {
+          ...item, //mantengo el resto de propiedades, nombre, imagen precio
+          quantity: item.quantity + 1 //pero modifico la cantidad
+        }
+      }
+      return item
+    })
+    setCart(updateCart)
+  }
+
+  function decreaseQuantity(id) {
+    const updateCartRest = cart.map(item => {
+      if (item.id === id && item.quantity > MIN_ITEMS) {
+        return {
+          ...item,
+          quantity: item.quantity - 1
+        }
+      }
+      return item
+    })
+    setCart(updateCartRest)
+  }
 
 
   return ( //El return es lo que se muestra en pantalla
@@ -42,6 +73,9 @@ function App() { //Un componente es un a función de JS y siempre debe iniciar c
     <>
       <Headers
         cart={cart}
+        removeFromCart={removeFromCart}
+        increaseQuantity={increaseQuantity}
+        decreaseQuantity={decreaseQuantity}
       />
 
       <main className="container-xl mt-5">
