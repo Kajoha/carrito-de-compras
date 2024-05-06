@@ -1,14 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Headers from "./components/Headers"
 import Guitar from "./components/Guitar"
 import { db } from './data/db'
 
 function App() { //Un componente es un a función de JS y siempre debe iniciar con mayuscula el nombre, se usan para la creación de aplicaciones y sitios web se recomienda usar .jsx o .tsx, los componentes deben ser reutilizables o separados por funcionalidad
 
-  const [data, setData] = useState(db)
-  const [cart, setCart] = useState([]) //El valor inicial del state preferiblemente deberia ser vacio, o false, si luego de iterar encuentra algo que cambie a true
+  const initialCart = () => {
+    const localStorageCart = localStorage.getItem('cart')
+    return localStorageCart ? JSON.parse(localStorageCart) : []
+  }
+
+  const [data] = useState(db)
+  const [cart, setCart] = useState(initialCart) //El valor inicial del state preferiblemente deberia ser vacio, o false, si luego de iterar encuentra algo que cambie a true
   const MAX_ITEMS = 5
   const MIN_ITEMS = 1
+
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart))
+  }, [cart]) // Este use effect no se tiene que mandar a llamar, el hace que todo se actualice solo en el local storage
 
   function addToCard(item) {
     //un state es inmutable, por lo que tenemos que usar el useState para poder manipularlo
@@ -16,6 +25,7 @@ function App() { //Un componente es un a función de JS y siempre debe iniciar c
 
     const itemExists = cart.findIndex((guitar) => guitar.id === item.id);
     if (itemExists >= 0) {
+      if (cart[itemExists].quantity >= MAX_ITEMS) return
       const updatedCart = [...cart]
       updatedCart[itemExists].quantity++
       setCart(updatedCart)
@@ -62,6 +72,10 @@ function App() { //Un componente es un a función de JS y siempre debe iniciar c
     setCart(updateCartRest)
   }
 
+  function clearCard() {
+    setCart([]);
+  }
+
 
   return ( //El return es lo que se muestra en pantalla
     //Las Expressions - pueden ir despues del return
@@ -76,6 +90,7 @@ function App() { //Un componente es un a función de JS y siempre debe iniciar c
         removeFromCart={removeFromCart}
         increaseQuantity={increaseQuantity}
         decreaseQuantity={decreaseQuantity}
+        clearCard={clearCard}
       />
 
       <main className="container-xl mt-5">
